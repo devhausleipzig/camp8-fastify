@@ -1,13 +1,1 @@
-{
-	"pokemon": [
-		{ "name": "Charmander", "hp": 100, "attribute1": "fire" },
-		{ "name": "Pikachu", "hp": 40, "attribute1": "electric" },
-		{ "name": "Squirtle", "hp": 120, "attribute1": "water" },
-		{
-			"name": "Scyther",
-			"hp": 100,
-			"attribute1": "grass",
-			"attribute2": "insect"
-		}
-	]
-}
+{"pokemon":[{"name":"Charmander","hp":100,"attribute1":"fire"},{"name":"Pikachu","hp":40,"attribute1":"electric"},{"name":"Squirtle","hp":120,"attribute1":"water"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"pcyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":123,"attribute1":"grass","attribute2":"insect"},{"name":"Scyther","hp":123,"attribute1":"123","attribute2":"insect"},{"name":"Scyther","hp":100,"attribute1":"grass","attribute2":"insect"}]}

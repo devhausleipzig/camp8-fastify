@@ -2,7 +2,7 @@ GET http://localhost:3000/pokemon
 
 ###
 
-GET http://localhost:3000/pokemon/query?attribute=electric
+GET http://localhost:3000/pokemon/query?attribu=electric
 
 ###
 

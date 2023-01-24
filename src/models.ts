@@ -1,13 +1,44 @@
 import { z } from "zod";
+import { readDB } from "./server";
+
+const operators = ["gt", "lt", "eq"];
 
 const queryPokemon = z.object({
-	attribute: z.string(),
+	attribute: z.optional(z.string()),
+	hp: z.optional(
+		z.string().refine((val) => {
+			return operators.reduce((accum, operator) => {
+				return accum || val.startsWith(operator);
+			}, false);
+		})
+	),
+	prefix: z.optional(z.string())
+});
+
+type Pokemon = {
+	name: string;
+	hp: number;
+	attribute1: string;
+	attribute2?: string;
+};
+
+const postPokemon = z.object({
+	name: z.string().refine(
+		async (val) => {
+			return !Boolean(
+				readDB().pokemon.find((pokemon: Pokemon) => pokemon.name == val)
+			);
+		},
+		{ message: "Name already exists." }
+	),
 	hp: z.number(),
-	prefix: z.string()
+	attribute1: z.string(),
+	attribute2: z.string()
 });
 
 export const models = {
-	queryPokemon
+	queryPokemon,
+	postPokemon
 };
 
 ////////////////////

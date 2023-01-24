@@ -19,7 +19,7 @@ type Pokemon = {
 	attribute2?: string;
 };
 
-function readDB() {
+export function readDB() {
 	return JSON.parse(
 		readFileSync("./src/db.json", {
 			encoding: "utf8"
@@ -35,13 +35,19 @@ async function init() {
 	const { schemas, $ref } = buildJsonSchemas(models);
 
 	// Require the framework and instantiate it
-	const fastify = await register(Fastify(), {
+	const fastify = await register(Fastify({ logger: true }), {
 		jsonSchemas: { schemas, $ref }
 	});
 
 	// Declare a route/endpoint
-	fastify.get("/pokemon/query", {
-		handler: async (request, reply) => {
+	fastify.get(
+		"/pokemon/query",
+		{
+			schema: {
+				querystring: $ref(`queryPokemon`)
+			}
+		},
+		async (request, reply) => {
 			//@ts-ignore
 			const { attribute, hp, prefix } = request.query;
 			console.log("query: ", attribute, hp, prefix);
@@ -93,111 +99,134 @@ async function init() {
 			}
 
 			return list;
-		},
-		schema: {
-			querystring: $ref(`queryPokemon`)
 		}
-	});
+	);
 
-	fastify.get("/pokemon", async (request, reply) => {
+	fastify.get("/pokemon", {}, async (request, reply) => {
 		return readDB().pokemon;
 	});
 
-	fastify.post("/pokemon", async (request, reply) => {
-		const pokemon = request.body as Pokemon;
+	fastify.post(
+		"/pokemon",
+		{
+			schema: {
+				body: $ref(`postPokemon`)
+			}
+		},
+		async (request, reply) => {
+			const pokemon = request.body as Pokemon;
 
-		//@ts-ignore
-		const list: Pokemon[] = readDB().pokemon;
-		list.push(pokemon);
+			//@ts-ignore
+			const list: Pokemon[] = readDB().pokemon;
+			list.push(pokemon);
 
-		writeDB({ pokemon: list });
-	});
-
-	fastify.put("/pokemon/:name", async (request, reply) => {
-		//@ts-ignore
-		const { name } = request.params;
-		console.log(name);
-		const newPokemon = request.body as Pokemon;
-
-		let list: Pokemon[] = readDB().pokemon;
-
-		const pokemon = list.find((pokemon) => {
-			return pokemon.name == name;
-		});
-
-		if (!pokemon) {
-			reply.status(404);
-			reply.send(`Could not find any pokemon called ${name}.`);
-			return;
+			writeDB({ pokemon: list });
 		}
+	);
 
-		list = list.filter((pokemon) => {
-			return !(pokemon.name == name);
-		});
+	fastify.put(
+		"/pokemon/:name",
+		{
+			schema: {
+				body: $ref(``)
+			}
+		},
+		async (request, reply) => {
+			//@ts-ignore
+			const { name } = request.params;
+			console.log(name);
+			const newPokemon = request.body as Pokemon;
 
-		list.push({
-			...newPokemon,
-			name: name
-		});
+			let list: Pokemon[] = readDB().pokemon;
 
-		writeDB({ pokemon: list });
+			const pokemon = list.find((pokemon) => {
+				return pokemon.name == name;
+			});
 
-		reply.status(200);
-	});
+			if (!pokemon) {
+				reply.status(404);
+				reply.send(`Could not find any pokemon called ${name}.`);
+				return;
+			}
 
-	fastify.patch("/pokemon/:name", async (request, reply) => {
-		//@ts-ignore
-		const { name } = request.params;
-		console.log(name);
-		const updatedFields = request.body as Pokemon;
+			list = list.filter((pokemon) => {
+				return !(pokemon.name == name);
+			});
 
-		let list: Pokemon[] = readDB().pokemon;
+			list.push({
+				...newPokemon,
+				name: name
+			});
 
-		const pokemon = list.find((pokemon) => {
-			return pokemon.name == name;
-		});
+			writeDB({ pokemon: list });
 
-		if (!pokemon) {
-			reply.status(404);
-			reply.send(`Could not find any pokemon called ${name}.`);
-			return;
+			reply.status(200);
 		}
+	);
 
-		list = list.filter((pokemon) => {
-			return !(pokemon.name == name);
-		});
+	fastify.patch(
+		"/pokemon/:name",
+		{ schema: { body: $ref(``) } },
+		async (request, reply) => {
+			//@ts-ignore
+			const { name } = request.params;
+			console.log(name);
+			const updatedFields = request.body as Pokemon;
 
-		list.push({
-			...pokemon,
-			...updatedFields,
-			name: name
-		});
+			let list: Pokemon[] = readDB().pokemon;
 
-		writeDB(list);
-	});
+			const pokemon = list.find((pokemon) => {
+				return pokemon.name == name;
+			});
 
-	fastify.delete("/pokemon/:name", async (request, reply) => {
-		//@ts-ignore
-		const { name } = request.params;
+			if (!pokemon) {
+				reply.status(404);
+				reply.send(`Could not find any pokemon called ${name}.`);
+				return;
+			}
 
-		let list: Pokemon[] = readDB().pokemon;
+			list = list.filter((pokemon) => {
+				return !(pokemon.name == name);
+			});
 
-		const pokemon = list.find((pokemon) => {
-			return pokemon.name == name;
-		});
+			list.push({
+				...pokemon,
+				...updatedFields,
+				name: name
+			});
 
-		if (!pokemon) {
-			reply.status(404);
-			reply.send(`Could not find any pokemon called ${name}.`);
-			return;
+			writeDB(list);
 		}
+	);
 
-		list = list.filter((pokemon) => {
-			return !(pokemon.name == name);
-		});
+	fastify.delete(
+		"/pokemon/:name",
+		{
+			schema: { body: $ref(``) }
+		},
+		async (request, reply) => {
+			//@ts-ignore
+			const { name } = request.params;
 
-		writeDB(list);
-	});
+			let list: Pokemon[] = readDB().pokemon;
+
+			const pokemon = list.find((pokemon) => {
+				return pokemon.name == name;
+			});
+
+			if (!pokemon) {
+				reply.status(404);
+				reply.send(`Could not find any pokemon called ${name}.`);
+				return;
+			}
+
+			list = list.filter((pokemon) => {
+				return !(pokemon.name == name);
+			});
+
+			writeDB(list);
+		}
+	);
 
 	// Run the server!
 	await fastify.listen({ port: 3000 });
