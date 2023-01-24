@@ -7,7 +7,7 @@ async function generateDB() {
 	);
 
 	const pokemon = response.data.results;
-	const list = [];
+	const list: any[] = [];
 
 	for (const { name, url } of pokemon) {
 		const response = await axios.get(url);
