@@ -2,6 +2,10 @@ GET http://localhost:3000/pokemon
 
 ###
 
+GET http://localhost:3000/pokemon/query?attribute=electric
+
+###
+
 POST http://localhost:3000/pokemon
 Content-Type: application/json
 
@@ -19,7 +23,19 @@ Content-Type: application/json
 
 {
     "name": "d;khsdfkjhsdf",
-    "hp": 50,
-    "attribute1": "fire",
-    "attribute2": "water"
+    "completedDifferent": "abc"
 }
+
+###
+
+PATCH http://localhost:3000/pokemon/Scyther
+Content-Type: application/json
+
+{
+    "name": "d;khsdfkjhsdf",
+    "hp": 666
+}
+
+###
+
+DELETE http://localhost:3000/pokemon/Scyther
