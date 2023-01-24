@@ -12,30 +12,32 @@ declare module "fastify" {
 	}
 }
 
+type Pokemon = {
+	name: string;
+	hp: number;
+	attribute1: string;
+	attribute2?: string;
+};
+
+function readDB() {
+	return JSON.parse(
+		readFileSync("./src/db.json", {
+			encoding: "utf8"
+		})
+	);
+}
+
+function writeDB(data: any) {
+	writeFileSync("./src/db.json", JSON.stringify(data));
+}
+
 async function init() {
+	const { schemas, $ref } = buildJsonSchemas(models);
+
 	// Require the framework and instantiate it
 	const fastify = await register(Fastify(), {
-		jsonSchemas: buildJsonSchemas(models)
+		jsonSchemas: { schemas, $ref }
 	});
-
-	type Pokemon = {
-		name: string;
-		hp: number;
-		attribute1: string;
-		attribute2?: string;
-	};
-
-	function readDB() {
-		return JSON.parse(
-			readFileSync("./src/db.json", {
-				encoding: "utf8"
-			})
-		);
-	}
-
-	function writeDB(data: any) {
-		writeFileSync("./src/db.json", JSON.stringify(data));
-	}
 
 	// Declare a route/endpoint
 	fastify.get("/pokemon/query", {
@@ -93,7 +95,7 @@ async function init() {
 			return list;
 		},
 		schema: {
-			querystring: `queryPokemon`
+			querystring: $ref(`queryPokemon`)
 		}
 	});
 
