@@ -21,14 +21,14 @@ type Pokemon = {
 
 export function readDB() {
 	return JSON.parse(
-		readFileSync("./src/db.json", {
+		readFileSync("./db.json", {
 			encoding: "utf8"
 		})
 	);
 }
 
 function writeDB(data: any) {
-	writeFileSync("./src/db.json", JSON.stringify(data));
+	writeFileSync("./db.json", JSON.stringify(data));
 }
 
 async function init() {
