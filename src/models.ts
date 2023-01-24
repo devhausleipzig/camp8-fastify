@@ -10,9 +10,9 @@ const undefModel = z.undefined();
 
 const boolModel = z.boolean();
 
-const arrayModel = z.array(z.string());
+export const arrayModel = z.array(z.string());
 
-const objectModel = z
+export const objectModel = z
 	.object({
 		apples: z.optional(z.string()),
 		pears: z.optional(z.number()),
