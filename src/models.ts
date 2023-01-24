@@ -1,55 +1,67 @@
 import { z } from "zod";
 
-const stringModel = z.string().min(10).max(20);
+const queryPokemon = z.object({
+	attribute: z.string(),
+	hp: z.number(),
+	prefix: z.string()
+});
 
-const numberModel = z.number().gte(20).lte(100);
+export const models = {
+	queryPokemon
+};
 
-const nullModel = z.null();
+////////////////////
 
-const undefModel = z.undefined();
+// const stringModel = z.string().min(10).max(20);
 
-const boolModel = z.boolean();
+// const numberModel = z.number().gte(20).lte(100);
 
-export const arrayModel = z.array(z.string());
+// const nullModel = z.null();
 
-export const objectModel = z
-	.object({
-		apples: z.optional(z.string()),
-		pears: z.optional(z.number()),
-		fruits: z.union([z.string(), z.number(), z.boolean()]) // fruits can be string or number or boolean
-	})
-	.refine(
-		(val) => {
-			return (
-				(Boolean(val.apples) || Boolean(val.pears)) &&
-				!(Boolean(val.apples) && Boolean(val.pears))
-			);
-		},
-		{ message: "You must have either apples or pears but not both." }
-	)
-	.transform((val) => {
-		if (val.pears) {
-			val.apples = String(val.pears);
-		}
+// const undefModel = z.undefined();
 
-		if (val.apples) {
-			val.pears = val.apples.length;
-		}
+// const boolModel = z.boolean();
 
-		return {
-			...val,
-			cherries: "123456"
-		};
-	});
+// export const arrayModel = z.array(z.string());
 
-const example = objectModel.parse({
-	apples: "green",
-	fruits: false
-})!;
+// export const objectModel = z
+// 	.object({
+// 		apples: z.optional(z.string()),
+// 		pears: z.optional(z.number()),
+// 		fruits: z.union([z.string(), z.number(), z.boolean()]) // fruits can be string or number or boolean
+// 	})
+// 	.refine(
+// 		(val) => {
+// 			return (
+// 				(Boolean(val.apples) || Boolean(val.pears)) &&
+// 				!(Boolean(val.apples) && Boolean(val.pears))
+// 			);
+// 		},
+// 		{ message: "You must have either apples or pears but not both." }
+// 	)
+// 	.transform((val) => {
+// 		if (val.pears) {
+// 			val.apples = String(val.pears);
+// 		}
 
-const arrayOfObjectsModel = z.array(
-	z.object({
-		key1: z.number(),
-		key2: z.boolean()
-	})
-);
+// 		if (val.apples) {
+// 			val.pears = val.apples.length;
+// 		}
+
+// 		return {
+// 			...val,
+// 			cherries: "123456"
+// 		};
+// 	});
+
+// const example = objectModel.parse({
+// 	apples: "green",
+// 	fruits: false
+// })!;
+
+// const arrayOfObjectsModel = z.array(
+// 	z.object({
+// 		key1: z.number(),
+// 		key2: z.boolean()
+// 	})
+// );

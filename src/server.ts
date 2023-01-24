@@ -1,13 +1,8 @@
 import Fastify from "fastify";
 import { read, readFileSync, writeFileSync } from "fs";
-import { arrayModel, objectModel } from "./models";
+import { models } from "./models";
 
 import { FastifyZod, buildJsonSchemas, register } from "fastify-zod";
-
-const models = {
-	objectModel,
-	arrayModel
-};
 
 // Global augmentation, as suggested by
 // https://www.fastify.io/docs/latest/Reference/TypeScript/#creating-a-typescript-fastify-plugin
@@ -43,56 +38,63 @@ async function init() {
 	}
 
 	// Declare a route/endpoint
-	fastify.get("/pokemon/query", async (request, reply) => {
-		//@ts-ignore
-		const { attribute, hp, prefix } = request.query;
-		console.log("query: ", attribute, hp, prefix);
+	fastify.get("/pokemon/query", {
+		handler: async (request, reply) => {
+			//@ts-ignore
+			const { attribute, hp, prefix } = request.query;
+			console.log("query: ", attribute, hp, prefix);
 
-		let list: Pokemon[] = readDB().pokemon;
+			let list: Pokemon[] = readDB().pokemon;
 
-		if (attribute) {
-			list = list.filter((pokemon) => {
-				return Boolean(
-					[pokemon.attribute1, pokemon.attribute2].find((attr) => {
-						return attr == attribute;
-					})
-				);
-			});
-		}
-
-		if (hp) {
-			if ((hp as string).startsWith("lt")) {
-				const number = Number((hp as string).replace("lt", ""));
-
+			if (attribute) {
 				list = list.filter((pokemon) => {
-					return pokemon.hp < number;
+					return Boolean(
+						[pokemon.attribute1, pokemon.attribute2].find(
+							(attr) => {
+								return attr == attribute;
+							}
+						)
+					);
 				});
-			} else if ((hp as string).startsWith("gt")) {
-				const number = Number((hp as string).replace("gt", ""));
-
-				list = list.filter((pokemon) => {
-					return pokemon.hp > number;
-				});
-			} else if ((hp as string).startsWith("eq")) {
-				const number = Number((hp as string).replace("eq", ""));
-
-				list = list.filter((pokemon) => {
-					return pokemon.hp == number;
-				});
-			} else {
-				// nope
 			}
-		}
 
-		if (prefix) {
-			list = list.filter((pokemon) => {
-				return pokemon.name
-					.toLowerCase()
-					.startsWith(prefix.toLowerCase());
-			});
-		}
+			if (hp) {
+				if ((hp as string).startsWith("lt")) {
+					const number = Number((hp as string).replace("lt", ""));
 
-		return list;
+					list = list.filter((pokemon) => {
+						return pokemon.hp < number;
+					});
+				} else if ((hp as string).startsWith("gt")) {
+					const number = Number((hp as string).replace("gt", ""));
+
+					list = list.filter((pokemon) => {
+						return pokemon.hp > number;
+					});
+				} else if ((hp as string).startsWith("eq")) {
+					const number = Number((hp as string).replace("eq", ""));
+
+					list = list.filter((pokemon) => {
+						return pokemon.hp == number;
+					});
+				} else {
+					// nope
+				}
+			}
+
+			if (prefix) {
+				list = list.filter((pokemon) => {
+					return pokemon.name
+						.toLowerCase()
+						.startsWith(prefix.toLowerCase());
+				});
+			}
+
+			return list;
+		},
+		schema: {
+			querystring: `queryPokemon`
+		}
 	});
 
 	fastify.get("/pokemon", async (request, reply) => {
@@ -196,12 +198,12 @@ async function init() {
 	});
 
 	// Run the server!
-	try {
-		await fastify.listen({ port: 3000 });
-	} catch (err) {
-		fastify.log.error(err);
-		process.exit(1);
-	}
+	await fastify.listen({ port: 3000 });
 }
 
-init();
+try {
+	init();
+} catch (err) {
+	// fastify.log.error(err);
+	process.exit(1);
+}
