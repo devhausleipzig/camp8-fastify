@@ -1,0 +1,25 @@
+GET http://localhost:3000/pokemon
+
+###
+
+POST http://localhost:3000/pokemon
+Content-Type: application/json
+
+{
+    "name": "Scyther",
+    "hp": 100,
+    "attribute1": "grass",
+    "attribute2": "insect"
+}
+
+###
+
+PUT http://localhost:3000/pokemon/Scyther
+Content-Type: application/json
+
+{
+    "name": "d;khsdfkjhsdf",
+    "hp": 50,
+    "attribute1": "fire",
+    "attribute2": "water"
+}
