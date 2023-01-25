@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { read, readFileSync, writeFileSync } from "fs";
+import cors from "@fastify/cors";
 import { models } from "./models";
 
 import { FastifyZod, buildJsonSchemas, register } from "fastify-zod";
@@ -39,6 +40,8 @@ async function init() {
 		jsonSchemas: { schemas, $ref }
 	});
 
+	fastify.register(cors, { origin: ["*"] });
+
 	// Declare a route/endpoint
 	fastify.get(
 		"/pokemon/query",
@@ -48,57 +51,11 @@ async function init() {
 			}
 		},
 		async (request, reply) => {
-			//@ts-ignore
-			const { attribute, hp, prefix } = request.query;
-			console.log("query: ", attribute, hp, prefix);
+			const pokemon = readDB().pokemon;
 
-			let list: Pokemon[] = readDB().pokemon;
-
-			if (attribute) {
-				list = list.filter((pokemon) => {
-					return Boolean(
-						[pokemon.attribute1, pokemon.attribute2].find(
-							(attr) => {
-								return attr == attribute;
-							}
-						)
-					);
-				});
-			}
-
-			if (hp) {
-				if ((hp as string).startsWith("lt")) {
-					const number = Number((hp as string).replace("lt", ""));
-
-					list = list.filter((pokemon) => {
-						return pokemon.hp < number;
-					});
-				} else if ((hp as string).startsWith("gt")) {
-					const number = Number((hp as string).replace("gt", ""));
-
-					list = list.filter((pokemon) => {
-						return pokemon.hp > number;
-					});
-				} else if ((hp as string).startsWith("eq")) {
-					const number = Number((hp as string).replace("eq", ""));
-
-					list = list.filter((pokemon) => {
-						return pokemon.hp == number;
-					});
-				} else {
-					// nope
-				}
-			}
-
-			if (prefix) {
-				list = list.filter((pokemon) => {
-					return pokemon.name
-						.toLowerCase()
-						.startsWith(prefix.toLowerCase());
-				});
-			}
-
-			return list;
+			return pokemon.map((pokemon: any) => {
+				return pokemon.name;
+			});
 		}
 	);
 
@@ -124,112 +81,112 @@ async function init() {
 		}
 	);
 
-	fastify.put(
-		"/pokemon/:name",
-		{
-			schema: {
-				body: $ref(``)
-			}
-		},
-		async (request, reply) => {
-			//@ts-ignore
-			const { name } = request.params;
-			console.log(name);
-			const newPokemon = request.body as Pokemon;
+	// fastify.put(
+	// 	"/pokemon/:name",
+	// 	{
+	// 		schema: {
+	// 			body: $ref(``)
+	// 		}
+	// 	},
+	// 	async (request, reply) => {
+	// 		//@ts-ignore
+	// 		const { name } = request.params;
+	// 		console.log(name);
+	// 		const newPokemon = request.body as Pokemon;
 
-			let list: Pokemon[] = readDB().pokemon;
+	// 		let list: Pokemon[] = readDB().pokemon;
 
-			const pokemon = list.find((pokemon) => {
-				return pokemon.name == name;
-			});
+	// 		const pokemon = list.find((pokemon) => {
+	// 			return pokemon.name == name;
+	// 		});
 
-			if (!pokemon) {
-				reply.status(404);
-				reply.send(`Could not find any pokemon called ${name}.`);
-				return;
-			}
+	// 		if (!pokemon) {
+	// 			reply.status(404);
+	// 			reply.send(`Could not find any pokemon called ${name}.`);
+	// 			return;
+	// 		}
 
-			list = list.filter((pokemon) => {
-				return !(pokemon.name == name);
-			});
+	// 		list = list.filter((pokemon) => {
+	// 			return !(pokemon.name == name);
+	// 		});
 
-			list.push({
-				...newPokemon,
-				name: name
-			});
+	// 		list.push({
+	// 			...newPokemon,
+	// 			name: name
+	// 		});
 
-			writeDB({ pokemon: list });
+	// 		writeDB({ pokemon: list });
 
-			reply.status(200);
-		}
-	);
+	// 		reply.status(200);
+	// 	}
+	// );
 
-	fastify.patch(
-		"/pokemon/:name",
-		{ schema: { body: $ref(``) } },
-		async (request, reply) => {
-			//@ts-ignore
-			const { name } = request.params;
-			console.log(name);
-			const updatedFields = request.body as Pokemon;
+	// fastify.patch(
+	// 	"/pokemon/:name",
+	// 	{ schema: { body: $ref(``) } },
+	// 	async (request, reply) => {
+	// 		//@ts-ignore
+	// 		const { name } = request.params;
+	// 		console.log(name);
+	// 		const updatedFields = request.body as Pokemon;
 
-			let list: Pokemon[] = readDB().pokemon;
+	// 		let list: Pokemon[] = readDB().pokemon;
 
-			const pokemon = list.find((pokemon) => {
-				return pokemon.name == name;
-			});
+	// 		const pokemon = list.find((pokemon) => {
+	// 			return pokemon.name == name;
+	// 		});
 
-			if (!pokemon) {
-				reply.status(404);
-				reply.send(`Could not find any pokemon called ${name}.`);
-				return;
-			}
+	// 		if (!pokemon) {
+	// 			reply.status(404);
+	// 			reply.send(`Could not find any pokemon called ${name}.`);
+	// 			return;
+	// 		}
 
-			list = list.filter((pokemon) => {
-				return !(pokemon.name == name);
-			});
+	// 		list = list.filter((pokemon) => {
+	// 			return !(pokemon.name == name);
+	// 		});
 
-			list.push({
-				...pokemon,
-				...updatedFields,
-				name: name
-			});
+	// 		list.push({
+	// 			...pokemon,
+	// 			...updatedFields,
+	// 			name: name
+	// 		});
 
-			writeDB(list);
-		}
-	);
+	// 		writeDB(list);
+	// 	}
+	// );
 
-	fastify.delete(
-		"/pokemon/:name",
-		{
-			schema: { body: $ref(``) }
-		},
-		async (request, reply) => {
-			//@ts-ignore
-			const { name } = request.params;
+	// fastify.delete(
+	// 	"/pokemon/:name",
+	// 	{
+	// 		schema: { body: $ref(``) }
+	// 	},
+	// 	async (request, reply) => {
+	// 		//@ts-ignore
+	// 		const { name } = request.params;
 
-			let list: Pokemon[] = readDB().pokemon;
+	// 		let list: Pokemon[] = readDB().pokemon;
 
-			const pokemon = list.find((pokemon) => {
-				return pokemon.name == name;
-			});
+	// 		const pokemon = list.find((pokemon) => {
+	// 			return pokemon.name == name;
+	// 		});
 
-			if (!pokemon) {
-				reply.status(404);
-				reply.send(`Could not find any pokemon called ${name}.`);
-				return;
-			}
+	// 		if (!pokemon) {
+	// 			reply.status(404);
+	// 			reply.send(`Could not find any pokemon called ${name}.`);
+	// 			return;
+	// 		}
 
-			list = list.filter((pokemon) => {
-				return !(pokemon.name == name);
-			});
+	// 		list = list.filter((pokemon) => {
+	// 			return !(pokemon.name == name);
+	// 		});
 
-			writeDB(list);
-		}
-	);
+	// 		writeDB(list);
+	// 	}
+	// );
 
 	// Run the server!
-	await fastify.listen({ port: 3000 });
+	await fastify.listen({ port: 3000, host: "127.0.0.1" });
 }
 
 try {
