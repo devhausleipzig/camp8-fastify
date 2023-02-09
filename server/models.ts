@@ -3,7 +3,7 @@ import { readDB } from "./server";
 
 const operators = ["gt", "lt", "eq"];
 
-const queryPokemon = z.object({
+const queryPokemonModel = z.object({
 	attribute: z.optional(z.string()),
 	hp: z.optional(
 		z.string().refine((val) => {
@@ -15,14 +15,16 @@ const queryPokemon = z.object({
 	prefix: z.optional(z.string())
 });
 
-type Pokemon = {
+export type Pokemon = {
 	name: string;
 	hp: number;
 	attribute1: string;
 	attribute2?: string;
 };
 
-const postPokemon = z.object({
+const namePathModel = z.object({ name: z.string() });
+
+const postPokemonModel = z.object({
 	name: z.string().refine(
 		async (val) => {
 			return !Boolean(
@@ -36,12 +38,22 @@ const postPokemon = z.object({
 	attribute2: z.string()
 });
 
+const putPokemonModel = postPokemonModel;
+
+const patchPokemonModel = putPokemonModel.partial();
+
 export const models = {
-	queryPokemon,
-	postPokemon
+	namePathModel,
+	queryPokemonModel,
+	postPokemonModel,
+	putPokemonModel,
+	patchPokemonModel
 };
 
 ////////////////////
+////////////////////
+
+// Example Models
 
 // const stringModel = z.string().min(10).max(20);
 
